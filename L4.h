@@ -5,17 +5,17 @@
  *      Author: mamat
  */
 
-#ifndef l4_packet_HPP_
-#define l4_packet_HPP_
+#ifndef L4_H_
+#define L4_H_
 
 #include "packets.hpp"
 
 class l4_packet : public generic_packet {
 	private:
-		unsigned short dst_prt = 0;
-	    unsigned short src_prt = 0;
-	    unsigned int addrs = 0;
-	    unsigned char data[DATA_ARR_SIZE] = 0;
+		unsigned short 	src_prt = 0;
+		unsigned short 	dst_prt = 0;
+	    unsigned int 	addrs = 0;
+	    unsigned char 	data[PACKET_DATA_SIZE] = {0};
 
 	public:
 		/* C'tor and D'tor */
@@ -28,10 +28,10 @@ class l4_packet : public generic_packet {
 		unsigned short get_dst_port() const;
 		unsigned int get_addrs() const;
 
-		virtual bool validate_packet(open_port_vec &open_ports,
-	                                uint8_t ip[IP_V4_SIZE],
-	                                uint8_t mask,
-	                                uint8_t mac[MAC_SIZE]) override;
+		virtual bool validate_packet(open_port_vec open_ports,
+                uint8_t ip[IP_V4_SIZE],
+                uint8_t mask,
+                uint8_t mac[MAC_SIZE]) override;
 
 		virtual bool proccess_packet(open_port_vec &open_ports,
 	                                uint8_t ip[IP_V4_SIZE],
@@ -40,4 +40,10 @@ class l4_packet : public generic_packet {
 
 		virtual bool as_string(std::string &packet) override;
 
-#endif /* l4_packet_HPP_ */
+	/* test HLEPER func - DELETE LATER */
+	// returns the i’th byte of the payload (0 ≤ i < PACKET_DATA_SIZE)
+		unsigned char get_data_byte(size_t i) const { return data[i]; }
+
+};
+
+#endif /* L4_H_ */
