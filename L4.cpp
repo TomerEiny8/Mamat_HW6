@@ -17,7 +17,7 @@
      * @return new L4 packet
      */
 	explicit l4_packet::l4_packet(const std::string& raw_data) {
-		std::string tmp = (extract_between_delimiters(raw_data, '|', 0, 1));
+		std::string tmp = extract_between_delimiters(raw_data, '|', 0, 1);
 		this->src_port =  static_cast<uint16_t>(std::stoul(tmp));
 
 		tmp = (extract_between_delimiters(raw_data, '|', 1, 2));
@@ -29,7 +29,8 @@
 		// need to add casting for data, perhaps with a loop?
 
 	}
+
 	/* Getters */
-	uint16_t l4_packet::get_src_port() const { return this->src_port; }
-	uint16_t l4_packet::get_dst_port() const { return this->dst_port; }
-	uint32_t l4_packet::get_addrs() const { return this->addrs; }
+	unsigned short l4_packet::get_src_port() const { return this->src_port; }
+	unsigned short l4_packet::get_dst_port() const { return this->dst_port; }
+	unsigned int l4_packet::get_addrs() const { return this->addrs; }

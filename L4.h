@@ -12,10 +12,10 @@
 
 class l4_packet : public generic_packet {
 	private:
-		uint16_t src_port = 0;				// 2 Bytes
-		uint16_t dst_port = 0;				// 2 Bytes
-		uint32_t addrs = 0; 				// 4 Bytes
-		uint8_t data[PACKET_DATA_SIZE]{0};	//32 Bytes
+		unsigned short dst_prt = 0;
+	    unsigned short src_prt = 0;
+	    unsigned int addrs = 0;
+	    unsigned char data[DATA_ARR_SIZE] = 0;
 
 	public:
 		/* C'tor and D'tor */
@@ -24,9 +24,9 @@ class l4_packet : public generic_packet {
 		virtual ~l4_packet() override = default;
 
 		/* Getters */
-		uint16_t get_src_port() const;
-		uint16_t get_dst_port() const;
-		uint32_t get_addrs() const;
+		unsigned short get_src_port() const;
+		unsigned short get_dst_port() const;
+		unsigned int get_addrs() const;
 
 		virtual bool validate_packet(open_port_vec &open_ports,
 	                                uint8_t ip[IP_V4_SIZE],
@@ -39,9 +39,5 @@ class l4_packet : public generic_packet {
 	                                memory_dest &dst) override;
 
 		virtual bool as_string(std::string &packet) override;
-
-	    virtual bool full_packet_string(std::string &packet) override;
-
-
 
 #endif /* l4_packet_HPP_ */
