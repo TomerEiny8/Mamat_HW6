@@ -8,7 +8,8 @@
  * and simulation infrastructure.
  *
  * This file is accessible to all components in the project and can be included
- * freely.
+ * freely. It is allowed (and expected) to be extended or modified as needed,
+ * provided the changes remain compatible with the existing codebase.
  */
 
 #ifndef __COMMON__
@@ -21,6 +22,8 @@
 namespace common {
     /* 'open_port' maximum data size. */
     const int DATA_ARR_SIZE = 64;
+    /* L5 size. */
+    const int PACKET_DATA_SIZE = 32;
     /* Amount of IP elements - in this exercise it will be 4. */
     const int IP_V4_SIZE = 4;
     /* Amount of MAC elements - in this exercise it will be 6. */
@@ -59,9 +62,13 @@ namespace common {
          * @fn print_hex_byte
          * @brief Prints a single byte as a 2-digit lowercase hexadecimal number.
          *
-         * @param idx - Index of the byte to print, passed as a `char`.
+         * @param idx - Index of the char in 'data' to print.
          *
          * @return None.
+         * 
+         * @note It is internally cast to `unsigned char` to ensure correct
+         *      formatting even for negative values, and then to `int` for
+         *      output.
          */
         void print_hex_byte(int idx) {
             std::cout << std::hex << std::setw(2) << std::setfill('0')
