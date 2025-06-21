@@ -129,7 +129,7 @@ l4_packet::l4_packet(const std::string& raw_data) {
     		this->TTL--;
     		this->CS_l3--;
     		dst = RQ;
-    		this->as_string(packet_string);
+    		this.as_string(packet_string);
     		RQ.push_back(packet_string);
     		return true;
     	}
@@ -139,7 +139,7 @@ l4_packet::l4_packet(const std::string& raw_data) {
         	this->CS_l3--;
         	memcpy(this->src_ip, ip, IP_V4_SIZE);
         	dst = TQ;
-        	this->as_string(packet_string);
+        	this.as_string(packet_string);
         	TQ.push_back(packet_string);
         	return true;
         }
@@ -149,7 +149,7 @@ l4_packet::l4_packet(const std::string& raw_data) {
            	this->TTL--;
    	       	this->CS_l3--;
            	dst = TQ;
-           	this->as_string(packet_string);
+           	this.as_string(packet_string);
            	TQ.push_back(packet_string);
            	return true;
         }
