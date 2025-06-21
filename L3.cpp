@@ -1,5 +1,5 @@
 /*
- * l4.cpp
+ * l3.cpp
  *
  *  Created on: 19 Jun 2025
  *      Author: mamat
@@ -69,18 +69,22 @@ l4_packet::l4_packet(const std::string& raw_data) {
 	                                uint8_t ip[IP_V4_SIZE],
 	                                uint8_t mask,
 	                                uint8_t mac[MAC_SIZE]) {
+
 		if(!l4_packet::validate_packet(open_ports, ip, mask, mac)){
 			return false;
 		}
 		if(this->TTL <= 0){
 			return false;
 		}
-
 		uint8_t sum = 0;
 		std::string packet_string= generic_packet::extract_between_delimiters
 												(l3::as_string(this),'|', 0);
 		for(char c : packet_string){
 			sum += static_cast<uint8_t>(c);
+		}
+		sum -= this->CS_l3;
+		if(this->CS_l3 != sum){
+			return false;
 		}
 		return true;
 	}
@@ -111,40 +115,53 @@ l4_packet::l4_packet(const std::string& raw_data) {
 
     	bool is_src_ip = memcmp(this->src_ip, ip, IP_V4_SIZE);
     	bool is_dst_ip = memcmp(this->dst_ip, ip, IP_V4_SIZE);
+    	std::string packet_string = "";
 
     	if(!this->validate_packet(open_ports, ip, mask, NULL){
     		return false;
     	}
-    	// case 2.1 - Packet entering the network
-    	if(!is_src_ip && is_dst_ip){
+
+    	// Belong to network mean the same number of "mask" bits at the begining of th ip
+    	// Need to make a function that brings the ip including the mask
+
+    	// case 2.1 - Packet entering the network - with the mask
+    	if(!is_src_ip && is_dst_ip && this->TTL > 1){
     		this->TTL--;
     		this->CS_l3--;
-    		memory_dest = RQ;
-    		RQ.push_back(l3_packet::as_string(this));
+    		dst = RQ;
+    		this->as_string(packet_string);
+    		RQ.push_back(packet_string);
     		return true;
     	}
-    	// case 2.2 - Packet exiting the network
-    	if(is_src_ip && !is_dst_ip){
+    	// case 2.2 - Packet exiting the network - with the mask
+    	if(is_src_ip && !is_dst_ip && this->TTL > 1){
         	this->TTL--;
         	this->CS_l3--;
         	memcpy(this->src_ip, ip, IP_V4_SIZE);
-        	memory_dest = TQ;
-        	TQ.push_back(l3_packet::as_string(this));
+        	dst = TQ;
+        	this->as_string(packet_string);
+        	TQ.push_back(packet_string);
         	return true;
         }
 
-    	// case 2.3 - Packet is going threw
-    	if(!is_src_ip && !is_dst_ip){
+    	// case 2.3 - Packet is going threw - with the mask
+    	if(!is_src_ip && !is_dst_ip && this->TTL > 1){
            	this->TTL--;
    	       	this->CS_l3--;
-           	memory_dest = TQ;
-           	TQ.push_back(l3_packet::as_string(this));
+           	dst = TQ;
+           	this->as_string(packet_string);
+           	TQ.push_back(packet_string);
            	return true;
         }
 
-    	// case 2.4 - NIC = ip_dst
-    	l4_packet::proccess_packet(opent_ports, ip, mask, dst);
+    	// to add case 2.5
+
+
+    	// case 2.4 - NIC = ip_dst - without the mask
+    	l4_packet::this.proccess_packet(opent_ports, ip, mask, dst);
     	return true;
+
+
     }
 
     /**
