@@ -9,6 +9,7 @@
 #define L4_H_
 
 #include "packets.hpp"
+#include <string>
 
 class l4_packet : public generic_packet {
 	private:
