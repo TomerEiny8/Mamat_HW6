@@ -28,6 +28,12 @@ class l4_packet : public generic_packet {
 		unsigned short get_dst_port() const;
 		unsigned int get_addrs() const;
 
+		// Setters
+    		void set_src_prt(unsigned short prt);
+   	 	void set_dst_prt(unsigned short prt);
+   		void set_addrs(unsigned int addr);
+  	        void set_data(const uint8_t* d);
+
 		virtual bool validate_packet(open_port_vec open_ports,
                 uint8_t ip[IP_V4_SIZE],
                 uint8_t mask,
