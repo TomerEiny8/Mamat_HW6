@@ -5,8 +5,8 @@ set -e
 
 echo "🛠️ מקמפל את הפרויקט..."
 
-g++ -std=c++17 -Wall -Wextra -o test_exec \
-    L3.cpp L4.cpp test.cpp
+g++ -std=c++17 -Wall -Wextra -o test1_exec \
+    L3.cpp L4.cpp test1.cpp
 
 echo "🚀 מריץ את הבדיקות..."
-./test_exec
+./test1_exec
