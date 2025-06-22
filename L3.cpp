@@ -77,8 +77,10 @@ l4_packet::l4_packet(const std::string& raw_data) {
 			return false;
 		}
 		uint8_t sum = 0;
-		std::string packet_string= generic_packet::extract_between_delimiters
-												(l3::as_string(this),'|', 0);
+		std::string str;
+		l3_packet::as_string(str);
+		std::string packet_string = generic_packet::extract_between_delimiters
+												(str,'|', 0);
 		for(char c : packet_string){
 			sum += static_cast<uint8_t>(c);
 		}
@@ -114,10 +116,10 @@ l4_packet::l4_packet(const std::string& raw_data) {
 									memory_dest &dst) {
 
     	bool is_dst_ip = (memcmp(this->dst_ip, ip, IP_V4_SIZE) == 0);
-    	bool is_src_in_net = (memcmp(ip_with_mask(this->src_ip, mask),
-    								ip_with_mask(ip, mask), IP_V4_SIZE) == 0);
-    	bool is_dst_in_net = (memcmp(ip_with_mask(this->dst_ip, mask),
-    								ip_with_mask(ip, mask), IP_V4_SIZE) == 0);
+    	bool is_src_in_net = (ip_with_mask(this->src_ip, mask) ==
+    								ip_with_mask(ip, mask));
+    	bool is_dst_in_net = (ip_with_mask(this->dst_ip, mask) ==
+    								ip_with_mask(ip, mask));
 
     	std::string packet_string = "";
 
@@ -158,7 +160,7 @@ l4_packet::l4_packet(const std::string& raw_data) {
         }
     	// case 2.4 - NIC = ip_dst - without the mask
     	if(is_dst_ip){
-    		this->l4_packet::proccess_packet(opent_ports, ip, mask, dst);
+    		this->l4_packet::proccess_packet(open_ports, ip, mask, dst);
     		return true;
     	}
 
@@ -186,7 +188,7 @@ l4_packet::l4_packet(const std::string& raw_data) {
     		if(i != IP_V4_SIZE -1)
     			packet += std::to_string(this->src_ip[i]) + ".";
     		else
-    			packet += std::to_string(this->dsrc_ip[i]);
+    			packet += std::to_string(this->src_ip[i]);
     	}
 
     	packet += "|";

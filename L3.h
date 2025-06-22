@@ -13,8 +13,8 @@
 
 class l3_packet : public l4_packet {
 	private:
-	    uint8_t		src_ip[IP+V4_SIZE] = {0};
-	    uint8_t 	dst_ip[IP+V4_SIZE] = {0};
+	    uint8_t		src_ip[IP_V4_SIZE] = {0};
+	    uint8_t 	dst_ip[IP_V4_SIZE] = {0};
 	    unsigned int 	TTL = 0;
 	    unsigned int 	CS_l3 = 0;
 

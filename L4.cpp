@@ -122,7 +122,7 @@ l4_packet::l4_packet(const std::string& raw_data) {
     			memcpy(port.data[this->addrs], this->data, PACKET_DATA_SIZE);
     		}
     	}
-    	memory_dest = LOCAL_DRAM; // Local DRAM
+    	dst = LOCAL_DRAM; // Local DRAM
     	return true;
     }
 
