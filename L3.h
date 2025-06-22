@@ -8,7 +8,6 @@
 #ifndef L4_H_
 #define L3_H_
 
-#include "packets.hpp"
 #include "L4.h"
 
 class l3_packet : public l4_packet {
