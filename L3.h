@@ -33,8 +33,8 @@ class l3_packet : public l4_packet {
    		unsigned int get_dst_ip_uint() const;
 
 		// Setters
-    		void set_src_ip(const uint8_t* ip);
-    		void set_dst_ip(const uint8_t* ip);
+    	void set_src_ip(const uint8_t* ip);
+    	void set_dst_ip(const uint8_t* ip);
    		void set_TTL(unsigned int ttl);
    		void set_CS_l3(unsigned int cs);
 

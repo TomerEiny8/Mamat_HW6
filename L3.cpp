@@ -47,6 +47,7 @@ l4_packet::l4_packet(const std::string& raw_data) {
 }
 */
 
+	// needs to change th ip !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	/* Getters */
 	unsigned int l3_packet::get_src_ip() const { return this->src_ip; }
 	unsigned int l3_packet::get_dst_ip() const { returnthis->dst_ip; }
@@ -204,6 +205,8 @@ l4_packet::l4_packet(const std::string& raw_data) {
     			packet += std::to_string(this->dst_ip[i]);
     	}
 
+
+    	// we can use the L4 as_string function !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
     	packet += "|"+ std::to_string(this->TTL) + "|" +
 				  std::to_string(this->CS_l3) + "|" +
