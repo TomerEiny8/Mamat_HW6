@@ -115,17 +115,20 @@ l4_packet::l4_packet(const std::string& raw_data) {
 
     	bool is_src_ip = memcmp(this->src_ip, ip, IP_V4_SIZE);
     	bool is_dst_ip = memcmp(this->dst_ip, ip, IP_V4_SIZE);
+    	bool is_src_in_net = memcmp(ip_with_mask(this->src_ip, mask),
+    								ip_with_mask(ip, mask), IP_V4_SIZE);
+    	bool is_dst_in_net = memcmp(ip_with_mask(this->dst_ip, mask),
+    								ip_with_mask(ip, mask), IP_V4_SIZE);
+
     	std::string packet_string = "";
 
     	if(!this->validate_packet(open_ports, ip, mask, NULL){
     		return false;
     	}
 
-    	// Belong to network mean the same number of "mask" bits at the begining of th ip
-    	// Need to make a function that brings the ip including the mask
 
     	// case 2.1 - Packet entering the network - with the mask
-    	if(!is_src_ip && is_dst_ip && this->TTL > 1){
+    	if(!is_src_in_net && is_dst_in_net && !is_dst_ip && this->TTL > 1){
     		this->TTL--;
     		this->CS_l3--;
     		dst = RQ;
@@ -133,8 +136,9 @@ l4_packet::l4_packet(const std::string& raw_data) {
     		RQ.push_back(packet_string);
     		return true;
     	}
+
     	// case 2.2 - Packet exiting the network - with the mask
-    	if(is_src_ip && !is_dst_ip && this->TTL > 1){
+    	if(is_src_in_net && !is_dst_in_net && this->TTL > 1){
         	this->TTL--;
         	this->CS_l3--;
         	memcpy(this->src_ip, ip, IP_V4_SIZE);
@@ -145,7 +149,7 @@ l4_packet::l4_packet(const std::string& raw_data) {
         }
 
     	// case 2.3 - Packet is going threw - with the mask
-    	if(!is_src_ip && !is_dst_ip && this->TTL > 1){
+    	if(!is_src_in_net && !is_dst_in_net && this->TTL > 1){
            	this->TTL--;
    	       	this->CS_l3--;
            	dst = TQ;
@@ -153,12 +157,17 @@ l4_packet::l4_packet(const std::string& raw_data) {
            	TQ.push_back(packet_string);
            	return true;
         }
-
-    	// to add case 2.5
-
-
     	// case 2.4 - NIC = ip_dst - without the mask
-    	l4_packet::this.proccess_packet(opent_ports, ip, mask, dst);
+    	if(is_dst_ip){
+    		l4_packet::this.proccess_packet(opent_ports, ip, mask, dst);
+    		return true;
+    	}
+
+    	// case 2.5 - only in inside network
+    	if(is_src_in_net && is_dst_in_net && this->TTL > 1){
+    		return false;
+    	}
+
     	return true;
 
 
@@ -183,4 +192,26 @@ l4_packet::l4_packet(const std::string& raw_data) {
     	return true;
     }
 
+    /**
+     * @fn ip_with_mask
+     * @brief return the ip with the mask number of left bits
+     *
+     * @param mask - number of lest bits to be considered
+     * @param ip - the number in the shape of an array, that we
+     * return his left bits only
+     *
+     * @return the "mask" number of left bits of the number "ip"
+     */
+	uint32_t ip_with_mask(uint8 mask, uint8_t ip[IP_V4_SIZE]){
+    	if(mask == 0) return 0;
+    	if(mask >= (8*IP_V4_SIZE)) mask = (8*IP_V4_SIZE);
 
+    	uint32_t num = 0;
+
+    	for(int i = 0; i < IP_V4_SIZE; i++){
+    		num = (num << 8) | ip[i];
+    	}
+
+    	num >>= (8*IP_V4_SIZE) - mask;
+    	return num;
+    }
