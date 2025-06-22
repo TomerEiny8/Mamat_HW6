@@ -50,7 +50,11 @@ l4_packet::l4_packet(const std::string& raw_data) {
 	unsigned short l4_packet::get_dst_port() const { return this->dst_prt; }
 	unsigned int l4_packet::get_addrs() const { return this->addrs; }
 
-
+	/* Setters */
+	void l4_packet::set_src_prt(unsigned short prt) { src_prt = prt; }
+	void l4_packet::set_dst_prt(unsigned short prt) { dst_prt = prt; }
+	void l4_packet::set_addrs(unsigned int addr) { addrs = addr; }
+	void l4_packet::set_data(const uint8_t* d) { std::memcpy(data, d, PACKET_DATA_SIZE); }
 	/*
 	 * @fn validate_packet
 	 * @brief Check whether the packet is valid.
