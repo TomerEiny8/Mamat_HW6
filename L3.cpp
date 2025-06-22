@@ -95,7 +95,7 @@ l4_packet::l4_packet(const std::string& raw_data) {
      *        stored in. In the case of local DRAM, the function will store
 	 *        the packet as a string in the relevant 'open_port' struct.
      *
-     * @param [in] open_ports - Vector containing all the NIC's open ports.
+     * @param [in] open_ports - Vector containidata[i]ng all the NIC's open ports.
      * @param [in] ip - NIC's IP address.
      * @param [in] mask - NIC's mask; together with the IP, determines the NIC's
      *        local net.
@@ -113,16 +113,15 @@ l4_packet::l4_packet(const std::string& raw_data) {
 									uint8_t mask,
 									memory_dest &dst) {
 
-    	bool is_src_ip = memcmp(this->src_ip, ip, IP_V4_SIZE);
-    	bool is_dst_ip = memcmp(this->dst_ip, ip, IP_V4_SIZE);
-    	bool is_src_in_net = memcmp(ip_with_mask(this->src_ip, mask),
-    								ip_with_mask(ip, mask), IP_V4_SIZE);
-    	bool is_dst_in_net = memcmp(ip_with_mask(this->dst_ip, mask),
-    								ip_with_mask(ip, mask), IP_V4_SIZE);
+    	bool is_dst_ip = (memcmp(this->dst_ip, ip, IP_V4_SIZE) == 0);
+    	bool is_src_in_net = (memcmp(ip_with_mask(this->src_ip, mask),
+    								ip_with_mask(ip, mask), IP_V4_SIZE) == 0);
+    	bool is_dst_in_net = (memcmp(ip_with_mask(this->dst_ip, mask),
+    								ip_with_mask(ip, mask), IP_V4_SIZE) == 0);
 
     	std::string packet_string = "";
 
-    	if(!this->validate_packet(open_ports, ip, mask, NULL){
+    	if(!this->validate_packet(open_ports, ip, mask, NULL)){
     		return false;
     	}
 
@@ -132,7 +131,7 @@ l4_packet::l4_packet(const std::string& raw_data) {
     		this->TTL--;
     		this->CS_l3--;
     		dst = RQ;
-    		this.as_string(packet_string);
+    		this->as_string(packet_string);
     		RQ.push_back(packet_string);
     		return true;
     	}
@@ -143,7 +142,7 @@ l4_packet::l4_packet(const std::string& raw_data) {
         	this->CS_l3--;
         	memcpy(this->src_ip, ip, IP_V4_SIZE);
         	dst = TQ;
-        	this.as_string(packet_string);
+        	this->as_string(packet_string);
         	TQ.push_back(packet_string);
         	return true;
         }
@@ -153,13 +152,13 @@ l4_packet::l4_packet(const std::string& raw_data) {
            	this->TTL--;
    	       	this->CS_l3--;
            	dst = TQ;
-           	this.as_string(packet_string);
+           	this->as_string(packet_string);
            	TQ.push_back(packet_string);
            	return true;
         }
     	// case 2.4 - NIC = ip_dst - without the mask
     	if(is_dst_ip){
-    		l4_packet::this.proccess_packet(opent_ports, ip, mask, dst);
+    		this->l4_packet::proccess_packet(opent_ports, ip, mask, dst);
     		return true;
     	}
 
@@ -168,7 +167,7 @@ l4_packet::l4_packet(const std::string& raw_data) {
     		return false;
     	}
 
-    	return true;
+    	return false;
 
 
     }
@@ -182,13 +181,34 @@ l4_packet::l4_packet(const std::string& raw_data) {
      * @return true in success, false in failure (e.g memory allocation failed).
      */
     bool l3_packet::as_string(std::string &packet){
-    	packet = std::to_string(this->src_ip) + "|" +
-    			 std::to_string(this->dst_ip) + "|" +
-				 std::to_string(this->TTL) + "|" +
-				 std::to_string(this->CS_l3) + "|" +
-    			 std::to_string(this->src_prt) + "|" +
-    			 std::to_string(this->dst_prt) + "|" +
-				 std::to_string(this->data);
+
+    	for(int i = 0; i < IP_V4_SIZE; i++){
+    		if(i != IP_V4_SIZE -1)
+    			packet += std::to_string(this->src_ip[i]) + ".";
+    		else
+    			packet += std::to_string(this->dsrc_ip[i]);
+    	}
+
+    	packet += "|";
+
+    	for(int i = 0; i < IP_V4_SIZE; i++){
+    		if(i != IP_V4_SIZE -1)
+    			packet += std::to_string(this->dst_ip[i]) + ".";
+    		else
+    			packet += std::to_string(this->dst_ip[i]);
+    	}
+
+
+    	packet += "|"+ std::to_string(this->TTL) + "|" +
+				  std::to_string(this->CS_l3) + "|" +
+    			  std::to_string(this->src_prt) + "|" +
+    			  std::to_string(this->dst_prt) + "|";
+    	for(int i = 0; i < PACKET_DATA_SIZE; i++){
+    		if(i != PACKET_DATA_SIZE -1)
+    			packet += std::to_string(this->data[i]) + " ";
+    		else
+    			packet += std::to_string(this->data[i]);
+    	}
     	return true;
     }
 
@@ -202,7 +222,7 @@ l4_packet::l4_packet(const std::string& raw_data) {
      *
      * @return the "mask" number of left bits of the number "ip"
      */
-	uint32_t ip_with_mask(uint8 mask, uint8_t ip[IP_V4_SIZE]){
+	uint32_t ip_with_mask(uint8_t mask, uint8_t ip[IP_V4_SIZE]){
     	if(mask == 0) return 0;
     	if(mask >= (8*IP_V4_SIZE)) mask = (8*IP_V4_SIZE);
 

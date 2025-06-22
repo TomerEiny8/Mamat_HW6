@@ -114,12 +114,12 @@ l4_packet::l4_packet(const std::string& raw_data) {
                             		uint8_t ip[IP_V4_SIZE],
 									uint8_t mask,
 									memory_dest &dst) {
-    	if(!this->validate_packet(open_ports, ip, mask, NULL){
+    	if(!this->validate_packet(open_ports, ip, mask, NULL)){
     		return false;
     	}
     	for(open_port& port : open_ports){
     		if(this->dst_prt == port.dst_prt) {
-    			port.data[this->addrs] = this->data;
+    			memcpy(port.data[this->addrs], this->data, PACKET_DATA_SIZE);
     		}
     	}
     	memory_dest = LOCAL_DRAM; // Local DRAM
@@ -136,7 +136,12 @@ l4_packet::l4_packet(const std::string& raw_data) {
      */
     bool l4_packet::as_string(std::string &packet){
     	packet = std::to_string(this->src_prt) + "|" +
-    			 std::to_string(this->dst_prt) + "|" +
-				 this->data;
+    			 std::to_string(this->dst_prt) + "|";
+    	for(int i = 0; i < PACKET_DATA_SIZE; i++){
+    		if(i != PACKET_DATA_SIZE -1)
+    			packet += std::to_string(this->data[i]) + " ";
+    		else
+    			packet += std::to_string(this->data[i]);
+    	}
     	return true;
     }

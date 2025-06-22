@@ -13,8 +13,8 @@
 
 class l3_packet : public l4_packet {
 	private:
-	    unsigned int 	src_ip = 0;
-	    unsigned int 	dst_ip = 0;
+	    uint8_t		src_ip[IP+V4_SIZE] = {0};
+	    uint8_t 	dst_ip[IP+V4_SIZE] = {0};
 	    unsigned int 	TTL = 0;
 	    unsigned int 	CS_l3 = 0;
 
@@ -25,8 +25,8 @@ class l3_packet : public l4_packet {
 		virtual ~l3_packet() override = default;
 
 		/* Getters */
-		unsigned short get_src_ip() const;
-		unsigned short get_dst_ip() const;
+		unsigned int get_src_ip() const;
+		unsigned int get_dst_ip() const;
 		unsigned int get_TTL() const;
 		unsigned int get_CS_l3() const;
 
