@@ -6,6 +6,7 @@
  */
 
 #include "L3.h"
+#include <cstring>
 
 /**
  * @fn l4_packet
@@ -47,16 +48,16 @@ l4_packet::l4_packet(const std::string& raw_data) {
 */
 
 	/* Getters */
-	unsigned int l3_packet::get_src_ip() const {
-		return reinterpret_cast<uint32_t>(this->src_ip);
-	}
-	unsigned int l3_packet::get_dst_ip() const {
-		return reinterpret_cast<uint32_t>(this->dst_ip);
-	}
+	unsigned int l3_packet::get_src_ip() const { return this->src_ip; }
+	unsigned int l3_packet::get_dst_ip() const { returnthis->dst_ip; }
 	unsigned int l3_packet::get_TTL() const { return this->TTL; }
 	unsigned int l3_packet::get_CS_l3() const { return this->CS_l3; }
 
-
+        /* Setters */
+	void l3_packet::set_src_ip(const uint8_t ip[IP_V4_SIZE]) { std::memcpy(src_ip, ip, IP_V4_SIZE); }
+	void l3_packet::set_dst_ip(const uint8_t ip[IP_V4_SIZE]) { std::memcpy(dst_ip, ip, IP_V4_SIZE); }
+	void l3_packet::set_mac(const uint8_t mac_val[MAC_SIZE]) { std::memcpy(mac, mac_val, MAC_SIZE); }
+	void l3_packet::set_TTL(unsigned int ttl) { TTL = ttl; }
 	/*
 	 * @fn validate_packet
 	 * @brief Check whether the packet is valid.
