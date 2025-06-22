@@ -28,12 +28,7 @@ class l4_packet : public generic_packet {
 		unsigned short get_src_port() const;
 		unsigned short get_dst_port() const;
 		unsigned int get_addrs() const;
-
-		// Setters
-    		void set_src_prt(unsigned short prt);
-   	 	void set_dst_prt(unsigned short prt);
-   		void set_addrs(unsigned int addr);
-  	        void set_data(const uint8_t* d);
+		const unsigned char* get_data() const;
 
 		virtual bool validate_packet(open_port_vec open_ports,
                 uint8_t ip[IP_V4_SIZE],
@@ -46,11 +41,6 @@ class l4_packet : public generic_packet {
 	                                memory_dest &dst) override;
 
 		virtual bool as_string(std::string &packet) override;
-
-	/* test HLEPER func - DELETE LATER */
-	// returns the i’th byte of the payload (0 ≤ i < PACKET_DATA_SIZE)
-		unsigned char get_data_byte(size_t i) const { return data[i]; }
-
 };
 
 #endif /* L4_H_ */
