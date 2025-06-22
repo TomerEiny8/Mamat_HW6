@@ -47,8 +47,12 @@ l4_packet::l4_packet(const std::string& raw_data) {
 */
 
 	/* Getters */
-	unsigned int l3_packet::get_src_ip() const { return this->src_ip; }
-	unsigned int l3_packet::get_dst_ip() const { return this->dst_ip; }
+	unsigned int l3_packet::get_src_ip() const {
+		return reinterpret_cast<uint32_t>(this->src_ip);
+	}
+	unsigned int l3_packet::get_dst_ip() const {
+		return reinterpret_cast<uint32_t>(this->dst_ip);
+	}
 	unsigned int l3_packet::get_TTL() const { return this->TTL; }
 	unsigned int l3_packet::get_CS_l3() const { return this->CS_l3; }
 
@@ -160,8 +164,7 @@ l4_packet::l4_packet(const std::string& raw_data) {
         }
     	// case 2.4 - NIC = ip_dst - without the mask
     	if(is_dst_ip){
-    		this->l4_packet::proccess_packet(open_ports, ip, mask, dst);
-    		return true;
+    		return this->l4_packet::proccess_packet(open_ports, ip, mask, dst);
     	}
 
     	// case 2.5 - only in inside network
