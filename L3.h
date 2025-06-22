@@ -25,10 +25,19 @@ class l3_packet : public l4_packet {
 		virtual ~l3_packet() override = default;
 
 		/* Getters */
-		unsigned int get_src_ip() const;
-		unsigned int get_dst_ip() const;
+		uint8_t* get_src_ip() const;
+		uint8_t* get_dst_ip() const;
 		unsigned int get_TTL() const;
 		unsigned int get_CS_l3() const;
+
+		unsigned int get_src_ip_uint() const;
+   		unsigned int get_dst_ip_uint() const;
+
+		// Setters
+    		void set_src_ip(const uint8_t* ip);
+    		void set_dst_ip(const uint8_t* ip);
+   		void set_TTL(unsigned int ttl);
+   		void set_CS_l3(unsigned int cs);
 
 		virtual bool validate_packet(open_port_vec open_ports,
                 uint8_t ip[IP_V4_SIZE],
