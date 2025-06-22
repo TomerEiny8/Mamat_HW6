@@ -6,7 +6,7 @@
  */
 
 #include "L4.h"
-
+#include <cstring>
 /**
  * @fn l4_packet
  * @brief Constructor from given string
