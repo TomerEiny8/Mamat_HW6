@@ -49,6 +49,7 @@ l4_packet::l4_packet(const std::string& raw_data) {
 	unsigned short l4_packet::get_src_port() const { return this->src_prt; }
 	unsigned short l4_packet::get_dst_port() const { return this->dst_prt; }
 	unsigned int l4_packet::get_addrs() const { return this->addrs; }
+	const uint8_t* l4_packet::get_data() const { return data; }
 
 	/* Setters */
 	void l4_packet::set_src_prt(unsigned short prt) { src_prt = prt; }
