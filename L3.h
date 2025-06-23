@@ -10,6 +10,11 @@
 
 #include "L4.h"
 
+enum L4_DELIMITERS_POS {
+	l4_start = 4,	/* after src_ip|dst_ip|TTL|CS_l3| */
+	l4_end = -1 	/* until end of string */
+};
+
 class l3_packet : public l4_packet {
 	private:
 	    uint8_t			src_ip[IP_V4_SIZE] = {0};

@@ -6,7 +6,7 @@
  */
 
 #include "L4.h"
-#include <cstring>
+
 /**
  * @fn l4_packet
  * @brief Constructs an l4_packet from a given string
@@ -40,7 +40,6 @@ l4_packet::l4_packet(const std::string& raw_data) {
 		} else {
 			this->data[i] =
 				static_cast<unsigned char>(std::stoul(byte_str, nullptr, 16));
-
 		}
 	}
 }
@@ -107,7 +106,7 @@ bool l4_packet::validate_packet(open_port_vec open_ports,
  *         RQ - Should be stored as a string in RQ.
  *         TQ - Should be stored as string in TQ.
  *
- * @return true in success, false in failure (e.g memory allocation failed).
+ * @return true in success, false in case packet is invalid.
  */
 
 bool l4_packet::proccess_packet(open_port_vec &open_ports,
@@ -115,7 +114,7 @@ bool l4_packet::proccess_packet(open_port_vec &open_ports,
 								uint8_t mask,
 								memory_dest &dst) {
 	uint8_t dummy_mac[MAC_SIZE] = {0};
-	if(!this->validate_packet(open_ports, ip, mask, dummy_mac)){
+	if(!l4_packet::validate_packet(open_ports, ip, mask, dummy_mac)){
 		return false;
 	}
 	for(open_port& port : open_ports){
@@ -133,7 +132,7 @@ bool l4_packet::proccess_packet(open_port_vec &open_ports,
  *
  * @param [out] packet - Packet as a string, ready to be stored in RQ/TQ.
  *
- * @return true in success, false in failure (e.g memory allocation failed).
+ * @return true always.
  */
 bool l4_packet::as_string(std::string &packet){
 	packet = std::to_string(this->src_prt) + "|" +

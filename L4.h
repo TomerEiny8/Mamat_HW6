@@ -10,6 +10,7 @@
 
 #include "packets.hpp"
 #include <string>
+#include <cstring>
 
 class l4_packet : public generic_packet {
 	private:
