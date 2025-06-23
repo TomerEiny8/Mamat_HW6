@@ -31,6 +31,7 @@ class l3_packet : public l4_packet {
 		const uint8_t* get_dst_ip() const;
 		unsigned int get_TTL() const;
 		unsigned int get_CS_l3() const;
+		virtual unsigned int calc_sum() const;
 
 		virtual bool validate_packet(open_port_vec open_ports,
                 uint8_t ip[IP_V4_SIZE],

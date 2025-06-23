@@ -85,28 +85,18 @@ bool l3_packet::validate_packet(open_port_vec open_ports,
 								uint8_t ip[IP_V4_SIZE],
 								uint8_t mask,
 								uint8_t mac[MAC_SIZE]) {
-	std::cout << "entered l3_packet::validate_packet" << std::endl;
 	if(!l4_packet::validate_packet(open_ports, ip, mask, mac)){
 		return false;
 	}
 	if(this->TTL <= 0){
 		return false;
 	}
-	unsigned int sum = 0;
-	std::string str;
-	l3_packet::as_string(str);
-	std::string packet_string = extract_between_delimiters(str,'|', 0);
-	std::cout << "packet_string = " << packet_string << std::endl;
-	std::cout << "sum =";
-	for(char c : packet_string){
-		std::cout << " + " << c;
-		sum += static_cast<unsigned int>(c);
-	}
-	sum -= this->CS_l3;
-	std::cout << std::endl << "sum = " << sum << " , CS_l3 = " << this->CS_l3 << std::endl;
+
+	unsigned int sum = calc_sum();
 	if(this->CS_l3 != sum){
 		return false;
 	}
+
 	return true;
 }
 
@@ -219,6 +209,26 @@ bool l3_packet::as_string(std::string &packet){
 				  std::to_string(this->CS_l3) + "|" + l4_str;
 
 	return true;
+}
+
+/**
+ * @fn calc_sum
+ * @brief Calculates the byte-wise sum of all fields in the l3_packet.
+ *
+ * This includes the `TTL` field, each byte of `src_ip` and `dst_ip`
+ * and the result of the base class (`l4_packet`) `calc_sum()` function.
+ *
+ * @return The total sum as an unsigned integer.
+ */
+unsigned int l3_packet::calc_sum() const {
+	unsigned int sum = this->TTL;
+
+	for(int i = 0; i<IP_V4_SIZE; i++) {
+		sum = sum + this->src_ip[i] + this->dst_ip[i];
+	}
+	sum += l4_packet::calc_sum();
+
+	return sum;
 }
 
 /**
