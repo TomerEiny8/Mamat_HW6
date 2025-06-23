@@ -72,7 +72,7 @@ bool l4_packet::validate_packet(open_port_vec open_ports,
 	if(this->src_prt == this->dst_prt) {
 		return false;
 	}
-	if(this->addrs >= DATA_ARR_SIZE - PACKET_DATA_SIZE){
+	if(this->addrs >= (DATA_ARR_SIZE - PACKET_DATA_SIZE)){
 		return false;
 	}
 	for(open_port& port : open_ports){

@@ -53,36 +53,28 @@ void test_l3_packets(const std::string& filename) {
    open_ports.push_back(port2);
    memory_dest dst;
 
-   std::string p = "4.52.123.8|4.52.123.6|23|1036|2500|2000|0|"
-		   "dd 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
-		   "00 00 00 00 00 00 00 00 00 00 00";
-   l3_packet packet(p);
-   std::string out;
-   packet.as_string(out);
-   if (packet.proccess_packet(open_ports, ip, mask, dst)) {
-		std::cout << "Parsed L3 Packet: " << out << std::endl;
-   }
-   else {
-		std::cout << "Thrown L3 Packet: " << out << std::endl;
-   }
+   while (std::getline(file, line)) {
+	   try {
+		   l3_packet packet(line);
+		   std::string out;
+		   packet.as_string(out);
 
- /*   while (std::getline(file, line)) {
-        try {
-            l3_packet packet(line);
-            std::string out;
-			packet.as_string(out);
-
-			if (packet.proccess_packet(open_ports, ip, mask, dst)) {
-				std::cout << "Parsed L3 Packet: " << out << std::endl;
-			}
-			else {
-				std::cout << "Thrown L3 Packet: " << out << std::endl;
-			}
-        } catch (...) {
-            std::cerr << "Failed to parse L3 packet: " << line << std::endl;
-        }
-    }
-    std::cout << std::endl;*/
+		   if (packet.proccess_packet(open_ports, ip, mask, dst)) {
+			   if (dst == RQ)
+				   std::cout << "Parsed L3 Packet into RQ: " << out << std::endl;
+			   if (dst == TQ)
+				   std::cout << "Parsed L3 Packet into TQ: " << out << std::endl;
+			   if (dst == LOCAL_DRAM)
+				   std::cout << "Parsed L3 Packet into LOCAL_DRAM: " << out << std::endl;
+		   }
+		   else {
+			   std::cout << "Thrown L3 Packet: " << out << std::endl;
+		   }
+	   } catch (...) {
+		   std::cerr << "Failed to parse L3 packet: " << line << std::endl;
+	   }
+	}
+	std::cout << std::endl;
 }
 
 int main() {
@@ -94,3 +86,9 @@ int main() {
     return 0;
 }
 
+
+/* data for calc_sum check
+ * "4.52.123.8|4.52.123.6|23|1036|2500|2000|0|"
+		   "dd 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
+		   "00 00 00 00 00 00 00 00 00 00 00";
+ */
