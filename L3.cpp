@@ -85,9 +85,10 @@ bool l3_packet::validate_packet(open_port_vec open_ports,
 								uint8_t ip[IP_V4_SIZE],
 								uint8_t mask,
 								uint8_t mac[MAC_SIZE]) {
-	if(!l4_packet::validate_packet(open_ports, ip, mask, mac)){
+	/*if(!l4_packet::validate_packet(open_ports, ip, mask, mac)){
+		std::cout << "Validate Failed: due to l4_packet failure" << std::endl;
 		return false;
-	}
+	}*/
 	if(this->TTL <= 0){
 		return false;
 	}
@@ -127,6 +128,7 @@ bool l3_packet::proccess_packet(open_port_vec &open_ports,
 								memory_dest &dst) {
 	uint8_t dummy_mac[MAC_SIZE] = {0};
 	if(!this->validate_packet(open_ports, ip, mask, dummy_mac)){
+		std::cout << "Failed: due to validate_packet" << std::endl;
 		return false;
 	}
 
@@ -142,12 +144,14 @@ bool l3_packet::proccess_packet(open_port_vec &open_ports,
 
 	// case 2.5 - packet is in inside the network
 	if(is_src_in_net && is_dst_in_net){
+		std::cout << "Failed: packet inside the network" << std::endl;
 		return false;
 	}
 
 	this->TTL--;
 	this->CS_l3--;
 	if (this->TTL <= 0){
+		std::cout << "Failed: TTL fault" << std::endl;
 		return false;
 	}
 	std::string packet_string = "";
