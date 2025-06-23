@@ -150,3 +150,29 @@ bool l4_packet::as_string(std::string &packet){
 	}
 	return true;
 }
+
+/**
+ * @fn calc_sum
+ * @brief Calculates the byte-wise sum of all fields in the l4_packet.
+ *
+ * This includes the `addrs` field, both bytes of `src_prt` and `dst_prt`
+ * and each byte of the `data` field.
+ *
+ * @return The total sum as an unsigned integer.
+ */
+unsigned int l4_packet::calc_sum() const {
+	unsigned int prt_low, prt_high, sum = this->addrs;
+
+	prt_low = static_cast<unsigned int>(this->src_prt & 0xFF);
+	prt_high = static_cast<unsigned int>((this->src_prt >> 8) & 0xFF);
+	sum += (prt_low + prt_high);
+
+	prt_low = static_cast<unsigned int>(this->dst_prt & 0xFF);
+	prt_high = static_cast<unsigned int>((this->dst_prt >> 8) & 0xFF);
+	sum += (prt_low + prt_high);
+
+	for (unsigned char data_byte : this->data) {
+		sum += static_cast<unsigned int>(data_byte);
+	}
+	return sum;
+}
