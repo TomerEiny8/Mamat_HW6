@@ -16,7 +16,28 @@
  * @return New simulation object.
  */
 nic_sim::nic_sim(std::string param_file) {
+	std::ifstream file(param_file);
+	std::string line, tmp, src_prt, dst_prt;
+	open_port port;
 
+	std::getline(file, line);
+	extract_and_write(line, this->mac, HEX, ':');
+
+	std::getline(file, line);
+	tmp = extract_between_delimiters(line, '\'', 0, 0);
+	extract_and_write(tmp, this->ip, DEC, ':');
+	tmp = extract_between_delimiters(line, '\'', 1, -1);
+	this->mask = static_cast<uint8_t>(std::stoul(tmp));
+
+	while (std::getline(file, line)) {
+		tmp = extract_between_delimiters(line, ':', 0, -1);
+		src_prt = extract_between_delimiters(tmp, ',', 0, 0);
+		dst_prt = extract_between_delimiters(tmp, ':', 1, -1);
+
+		port = open_port(static_cast<uint16_t>(std::stoul(dst_prt)),
+				static_cast<uint16_t>(std::stoul(src_prt)));
+		this->open_ports.push_back(port);
+	}
 }
 
 /**
@@ -28,7 +49,28 @@ nic_sim::nic_sim(std::string param_file) {
  * @return None.
  */
 void nic_sim::nic_flow(std::string packet_file) {
+	std::ifstream file(packet_file);
+	std::string line, packet_string;
+	memory_dest dst;
 
+	while (std::getline(file, line)) {
+		generic_packet* curr_packet = packet_factory(line);
+		if (curr_packet->validate_packet
+				(this->open_ports, this->ip, this->mask, this->mac)) {
+			if (curr_packet->proccess_packet
+					(this->open_ports, this->ip, this->mask, dst)) {
+				if (dst == RQ) {
+					curr_packet->as_string(packet_string);
+					RQ.push_back(packet_string);
+				}
+				if (dst == TQ) {
+					curr_packet->as_string(packet_string);
+					RQ.push_back(packet_string);
+				}
+				// case LOCAL_DRAM handled in L4_packet::proccess_packet
+			}
+		}
+	}
 }
 
 /**
@@ -49,7 +91,36 @@ void nic_sim::nic_flow(std::string packet_file) {
  * @return None.
  */
 void nic_sim::nic_print_results() {
+	std::string idx;
+	std::cout << "LOCAL_DRAM:" << std::endl;
 
+	for(open_port& port : open_ports) {
+		std::cout << port.src_prt << " " << port.dst_prt << ": ";
+		print_port_data(port);
+	}
+
+	std::cout << std::endl << "RQ:" << std::endl;
+	for (std::string idx : RQ) {
+		std::cout << idx << std::endl;
+	}
+
+	std::cout << std::endl << "TQ:" << std::endl;
+	for (std::string idx : TQ) {
+		std::cout << idx << std::endl;
+	}
+}
+
+void print_port_data(open_port &port) {
+	std::string prt_data;
+	char byte_buf[3];	// "ff" + "\0"
+	for(int i = 0; i < DATA_ARR_SIZE; i++){
+	std::snprintf(byte_buf, sizeof(byte_buf), "%02x", port.data[i]);
+	prt_data += byte_buf;
+	if(i != DATA_ARR_SIZE -1) {
+		prt_data += " ";
+	}
+	std::cout << prt_data << std::endl;
+}
 }
 
 /**
