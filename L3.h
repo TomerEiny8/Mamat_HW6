@@ -22,7 +22,6 @@ class l3_packet : public l4_packet {
 	    unsigned int 	TTL = 0;
 	    unsigned int 	CS_l3 = 0;
 
-	    void extract_ip(const std::string ip_str,  uint8_t (&ip)[IP_V4_SIZE]);
 	    uint32_t ip_with_mask(uint8_t mask, uint8_t ip[IP_V4_SIZE]);
 
 	public:

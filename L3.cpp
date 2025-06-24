@@ -22,10 +22,10 @@ l3_packet::l3_packet(const std::string& raw_data)
 	std::string tmp, byte_str;
 
 	tmp = extract_between_delimiters(raw_data, '|', 0, 0);
-	extract_ip(tmp, this->src_ip);
+	extract_and_write(tmp, this->src_ip, DEC, '.');
 
 	tmp = extract_between_delimiters(raw_data, '|', 1, 1);
-	extract_ip(tmp, this->dst_ip);
+	extract_and_write(tmp, this->dst_ip, DEC, '.');
 
 	tmp = extract_between_delimiters(raw_data, '|', 2, 2);
 	this->TTL =  static_cast<unsigned int>(std::stoul(tmp));
@@ -198,33 +198,6 @@ unsigned int l3_packet::calc_sum() const {
 	sum += l4_packet::calc_sum();
 
 	return sum;
-}
-
-/**
- * @fn extarct_ip
- * @brief extracts a 4-Byte IPv4 from its string representation
- *
- * This function parses a string-formatted IPv4 (e.g. "140.60.40.54")
- * and fills a 4Byte array with the corresponding numeric values
- *
- * @param [in] ip_str The string containing the IP with '.' as a delimiter
- * @param [out] ip The array to store the parsed IP address
- *
- * @return None.
- */
-void l3_packet::extract_ip(const std::string ip_str, uint8_t (&ip)[IP_V4_SIZE]) {
-	std::string byte_str;
-	for (int i = 0; i < IP_V4_SIZE; i++) {
-		byte_str = extract_between_delimiters(ip_str, '.', i, i);
-		if (i == IP_V4_SIZE-1) {
-			byte_str = extract_between_delimiters
-					(ip_str, '.', IP_V4_SIZE-1, -1);
-		}
-		if (byte_str.empty()) {
-			byte_str = "0";
-		}
-		ip[i] = static_cast<uint8_t>(std::stoul(byte_str));
-	}
 }
 
 /**
