@@ -53,7 +53,12 @@ bool l3_packet::validate_packet(open_port_vec open_ports,
 								uint8_t ip[IP_V4_SIZE],
 								uint8_t mask,
 								uint8_t mac[MAC_SIZE]) {
-	if(this->TTL <= 0){
+	if (!l4_packet::validate_packet(open_ports, ip, mask, mac)) {
+		return false;
+	}
+
+	//////////////////////////////////////////////////////////////
+	if(static_cast<int>(this->TTL) <= 0){
 		return false;
 	}
 
@@ -123,7 +128,9 @@ bool l3_packet::proccess_packet(open_port_vec &open_ports,
 
 	// case 2.2 - Packet exiting the network - with the mask
 	else if(is_src_in_net && !is_dst_in_net){
+		int CS_l3_diff = ip_sum_diff(this->src_ip, ip);
 		memcpy(this->src_ip, ip, IP_V4_SIZE);
+		this->CS_l3 += CS_l3_diff;
 		dst = TQ;
 	}
 
@@ -133,6 +140,14 @@ bool l3_packet::proccess_packet(open_port_vec &open_ports,
 	}
 
 	return true;
+}
+
+int l3_packet::ip_sum_diff(uint8_t curr_ip[IP_V4_SIZE], uint8_t new_ip[IP_V4_SIZE]) {
+	int diff = 0;
+	for (int i = 0; i < IP_V4_SIZE; i++) {
+		diff += (new_ip[i] - curr_ip[i]);
+	}
+	return diff;
 }
 
 /**
@@ -178,9 +193,10 @@ bool l3_packet::as_string(std::string &packet){
  * @return The total sum as an unsigned integer.
  */
 unsigned int l3_packet::calc_sum() const {
-	unsigned int sum = this->TTL;
+	unsigned int sum = 0;
 
 	for(int i = 0; i<IP_V4_SIZE; i++) {
+		sum += ((this->TTL >> i*8) & 0xFF);
 		sum += (this->src_ip[i] + this->dst_ip[i]);
 	}
 	sum += l4_packet::calc_sum();

@@ -58,7 +58,7 @@ bool l2_packet::validate_packet(open_port_vec open_ports,
 		}
 	}
 	unsigned int sum = l2_packet::calc_sum();
-	if(this->CS_l2 != sum){
+	if(static_cast<int>(this->CS_l2) < 0 || this->CS_l2 != sum){
 		return false;
 	}
 	return true;
@@ -151,7 +151,7 @@ unsigned int l2_packet::calc_sum() const {
 	}
 	sum += l3_packet::calc_sum();
 
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < sizeof(CS_l3); i++) {
 		nibble = static_cast<unsigned int>((CS_l3 >> 8*i) & 0xFF);
 		sum += nibble;
 	}
