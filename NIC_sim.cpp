@@ -25,7 +25,7 @@ nic_sim::nic_sim(const std::string param_file) {
 
 	std::getline(file, line);
 	tmp = extract_between_delimiters(line, '/', 0, 0);
-	extract_and_write(tmp, this->ip, DEC, ':');
+	extract_and_write(tmp, this->ip, DEC, '.');
 
 	tmp = extract_between_delimiters(line, '/', 1, -1);
 	this->mask = static_cast<uint8_t>(std::stoul(tmp));
