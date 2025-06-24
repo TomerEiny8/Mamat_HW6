@@ -18,6 +18,8 @@
 #include "L3.h"
 #include "L4.h"
 
+enum PACKET_TYPE { L2 = 2, L3, L4 };
+
 class nic_sim {
     public:
     /**
@@ -83,16 +85,32 @@ class nic_sim {
      * @param open_ports - Vector containing all open communications.
      * @param RQ - Vector of strings to store packets that sent to RQ.
      * @param TQ - Vector of strings to store packets that sent to TQ.
+     * @param ip - The NIC's IPv4.
+     * @param mask - The NIC's IPv4's mask .
+     * @param mac - The NIC's MAC.
      */
-    common::open_port_vec open_ports;
-    std::vector<std::string> RQ;
-    std::vector<std::string> TQ;
+    common::open_port_vec 		open_ports;
+    std::vector<std::string> 	RQ;
+    std::vector<std::string> 	TQ;
+    uint8_t 					ip[IP_V4_SIZE];
+    uint8_t 					mask;
+    uint8_t 					mac[MAC_SIZE];
 
     /**
      * @note It is recommended and even encouraged to add new functions or
      *       additional parameters to the object, but the existing functionality
      *       must be implemented.
      */
+
+    /**
+	 * @fn detect_packet_type
+	 * @brief Gets a string representing a packet, returns the packet type.
+	 *
+	 * @param packet - String representation of a packet.
+	 *
+	 * @return PACKET_TYPE corresponding to the packet's type.
+	 */
+    PACKET_TYPE detect_packet_type(std::string &packet);
 };
 
 #endif
