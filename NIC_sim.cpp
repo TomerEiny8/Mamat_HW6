@@ -15,7 +15,7 @@
  *
  * @return New simulation object.
  */
-nic_sim::nic_sim(std::string param_file) {
+nic_sim::nic_sim(const std::string param_file) {
 	std::ifstream file(param_file);
 	std::string line, tmp, src_prt, dst_prt;
 	open_port port;
@@ -24,13 +24,14 @@ nic_sim::nic_sim(std::string param_file) {
 	extract_and_write(line, this->mac, HEX, ':');
 
 	std::getline(file, line);
-	tmp = extract_between_delimiters(line, '\'', 0, 0);
+	tmp = extract_between_delimiters(line, '/', 0, 0);
 	extract_and_write(tmp, this->ip, DEC, ':');
-	tmp = extract_between_delimiters(line, '\'', 1, -1);
+
+	tmp = extract_between_delimiters(line, '/', 1, -1);
 	this->mask = static_cast<uint8_t>(std::stoul(tmp));
 
 	while (std::getline(file, line)) {
-		tmp = extract_between_delimiters(line, ':', 0, -1);
+		tmp = extract_between_delimiters(line, ':', 1, -1);
 		src_prt = extract_between_delimiters(tmp, ',', 0, 0);
 		dst_prt = extract_between_delimiters(tmp, ':', 1, -1);
 
@@ -48,7 +49,7 @@ nic_sim::nic_sim(std::string param_file) {
  *
  * @return None.
  */
-void nic_sim::nic_flow(std::string packet_file) {
+void nic_sim::nic_flow(const std::string packet_file) {
 	std::ifstream file(packet_file);
 	std::string line, packet_string;
 	memory_dest dst;
@@ -59,17 +60,18 @@ void nic_sim::nic_flow(std::string packet_file) {
 				(this->open_ports, this->ip, this->mask, this->mac)) {
 			if (curr_packet->proccess_packet
 					(this->open_ports, this->ip, this->mask, dst)) {
-				if (dst == RQ) {
+				if (dst == memory_dest::RQ) {
 					curr_packet->as_string(packet_string);
 					RQ.push_back(packet_string);
 				}
-				if (dst == TQ) {
+				if (dst == memory_dest::TQ) {
 					curr_packet->as_string(packet_string);
-					RQ.push_back(packet_string);
+					TQ.push_back(packet_string);
 				}
 				// case LOCAL_DRAM handled in L4_packet::proccess_packet
 			}
 		}
+		delete(curr_packet); /* free memory  allocated by packet_factory */
 	}
 }
 
@@ -91,7 +93,6 @@ void nic_sim::nic_flow(std::string packet_file) {
  * @return None.
  */
 void nic_sim::nic_print_results() {
-	std::string idx;
 	std::cout << "LOCAL_DRAM:" << std::endl;
 
 	for(open_port& port : open_ports) {
@@ -100,38 +101,16 @@ void nic_sim::nic_print_results() {
 	}
 
 	std::cout << std::endl << "RQ:" << std::endl;
-	for (std::string idx : RQ) {
-		std::cout << idx << std::endl;
+	for (std::string packet : RQ) {
+		std::cout << packet << std::endl;
 	}
 
 	std::cout << std::endl << "TQ:" << std::endl;
-	for (std::string idx : TQ) {
-		std::cout << idx << std::endl;
+	for (std::string packet : TQ) {
+		std::cout << packet << std::endl;
 	}
 }
 
-void print_port_data(open_port &port) {
-	std::string prt_data;
-	char byte_buf[3];	// "ff" + "\0"
-	for(int i = 0; i < DATA_ARR_SIZE; i++){
-	std::snprintf(byte_buf, sizeof(byte_buf), "%02x", port.data[i]);
-	prt_data += byte_buf;
-	if(i != DATA_ARR_SIZE -1) {
-		prt_data += " ";
-	}
-	std::cout << prt_data << std::endl;
-}
-}
-
-/**
- * @fn ~nic_sim
- * @brief Destructor of the class.
- *
- * @return None.
- */
-nic_sim::~nic_sim() {
-
-}
 
 /**
  * @fn packet_factory
@@ -143,18 +122,36 @@ nic_sim::~nic_sim() {
  * @return 	Pointer to a generic_packet object.
  * 			NULL if packet_type could not be detected.
  */
-generic_packet* nic_sim::packet_factory(std::string &packet) {
+generic_packet* nic_sim::packet_factory(const std::string &packet) {
 
 	PACKET_TYPE packet_type = detect_packet_type(packet);
 
 	switch (packet_type) {
-	case L2: return new l2_packet::l2_packet(packet);
-	case L3: return new l3_packet::l3_packet(packet);
-	case L4: return new l4_packet::l4_packet(packet);
+	case L2: return new l2_packet(packet);
+	case L3: return new l3_packet(packet);
+	case L4: return new l4_packet(packet);
 	default: return nullptr;
 	}
 }
 
+/* @fn print_port_data
+* @brief Prints a given port's data field to stdout.
+*  Each byte is printed in HEX format, spaces are printed between bytes.
+*
+* @return None.
+*/
+void nic_sim::print_port_data(const open_port &port) {
+	std::string prt_data;
+	char byte_buf[3];	// "ff" + "\0"
+	for(int i = 0; i < DATA_ARR_SIZE; i++){
+		std::snprintf(byte_buf, sizeof(byte_buf), "%02x", port.data[i]);
+		prt_data += byte_buf;
+		if(i != DATA_ARR_SIZE -1) {
+			prt_data += " ";
+		}
+	}
+	std::cout << prt_data << std::endl;
+}
 
 /**
  * @fn detect_packet_type
@@ -164,9 +161,9 @@ generic_packet* nic_sim::packet_factory(std::string &packet) {
  *
  * @return PACKET_TYPE corresponding to the packet's type.
  */
-PACKET_TYPE nic_sim::detect_packet_type(std::string &packet) {
+PACKET_TYPE nic_sim::detect_packet_type(const std::string &packet) {
 	std::string first_field =
-			generic_packet::extract_between_delimiters(packet, '|', 0, 0);
+			extract_between_delimiters(packet, '|', 0, 0);
 	for (char c : first_field) {
 		if (c == ':') {
 			return L2;

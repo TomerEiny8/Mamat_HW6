@@ -31,7 +31,7 @@ class nic_sim {
      *
      * @return New simulation object.
      */
-    nic_sim(std::string param_file);
+    nic_sim(const std::string param_file);
 
     /**
      * @fn nic_flow
@@ -41,7 +41,7 @@ class nic_sim {
      *
      * @return None.
      */
-    void nic_flow(std::string packet_file);
+    void nic_flow(const std::string packet_file);
 
     /**
      * @fn nic_print_results
@@ -68,7 +68,7 @@ class nic_sim {
      *
      * @return None.
      */
-    ~nic_sim();
+    ~nic_sim() = default;
 
     private:
     /**
@@ -80,7 +80,7 @@ class nic_sim {
      *
      * @return Pointer to a generic_packet object.
      */
-    generic_packet *packet_factory(std::string &packet);
+    generic_packet *packet_factory(const std::string &packet);
 
     /**
      * @param open_ports - Vector containing all open communications.
@@ -103,7 +103,7 @@ class nic_sim {
      *       must be implemented.
      */
 
-    void print_port_data(open_port &port);
+    void print_port_data(const open_port &port);
 
     /**
 	 * @fn detect_packet_type
@@ -113,7 +113,7 @@ class nic_sim {
 	 *
 	 * @return PACKET_TYPE corresponding to the packet's type.
 	 */
-    PACKET_TYPE detect_packet_type(std::string &packet);
+    PACKET_TYPE detect_packet_type(const std::string &packet);
 
     /**
 	 * @fn extract_between_delimiters
@@ -178,7 +178,7 @@ class nic_sim {
 	}
 
     /**
-	 * @fn extarct_and_write
+	 * @fn extract_and_write
 	 * @brief Extracts N Bytes of data from its delimited string
 	 * representation and writes the data into a given destination of size N
 	 *
