@@ -124,9 +124,9 @@ bool l4_packet::proccess_packet(open_port_vec &open_ports,
 	for(open_port& port : open_ports){
 		if(this->dst_prt == port.dst_prt) {
 			memcpy(&port.data[this->addrs], this->data, PACKET_DATA_SIZE);
+			dst = LOCAL_DRAM;
 		}
 	}
-	dst = LOCAL_DRAM;
 	return true;
 }
 
