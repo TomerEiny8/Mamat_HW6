@@ -159,18 +159,11 @@ void test_l2_single_packet() {
 int main() {
 	std::string packet_path;
 	packet_path = "/media/sf_shared/hw_6/test_students/test0_packets.in";
-    // test_l4_packets(packet_path);
+    test_l4_packets(packet_path);
     packet_path = "/media/sf_shared/hw_6/test_students/test1_packets.in";
-    // test_l3_packets(packet_path);
+    test_l3_packets(packet_path);
     packet_path = "/media/sf_shared/hw_6/test_students/test2_packets.in";
     test_l2_packets(packet_path);
-    test_l2_single_packet();
+    // test_l2_single_packet();
     return 0;
 }
-
-
-/* data for calc_sum check
- * "4.52.123.8|4.52.123.6|23|1036|2500|2000|0|"
-		   "dd 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
-		   "00 00 00 00 00 00 00 00 00 00 00";
- */
