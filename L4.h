@@ -27,11 +27,6 @@ class l4_packet : public generic_packet {
 		explicit l4_packet(const std::string& raw_data);
 		virtual ~l4_packet() override = default;
 
-		/* Getters */
-		unsigned short get_src_port() const;
-		unsigned short get_dst_port() const;
-		unsigned int get_addrs() const;
-		const unsigned char* get_data() const;
 		virtual unsigned int calc_sum() const;
 
 		virtual bool validate_packet(open_port_vec open_ports,

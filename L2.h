@@ -29,10 +29,6 @@ class l2_packet : public l3_packet {
 		explicit l2_packet(const std::string& raw_data);
 		virtual ~l2_packet() override = default;
 
-		/* Getters */
-/*		const uint8_t* get_src_mac() const;
-		const uint8_t* get_dst_mac() const;
-		unsigned int get_CS_l4() const;*/
 		virtual unsigned int calc_sum() const;
 
 		virtual bool validate_packet(open_port_vec open_ports,

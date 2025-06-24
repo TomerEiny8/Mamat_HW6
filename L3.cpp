@@ -35,9 +35,6 @@ l3_packet::l3_packet(const std::string& raw_data)
 }
 
 /* Getters */
-const uint8_t* l3_packet::get_src_ip() const { return this->src_ip; }
-const uint8_t* l3_packet::get_dst_ip() const { return this->dst_ip; }
-unsigned int l3_packet::get_TTL() const { return this->TTL; }
 unsigned int l3_packet::get_CS_l3() const { return this->CS_l3; }
 
 /*
@@ -92,13 +89,13 @@ bool l3_packet::proccess_packet(open_port_vec &open_ports,
 								uint8_t ip[IP_V4_SIZE],
 								uint8_t mask,
 								memory_dest &dst) {
-	uint8_t dummy_mac[MAC_SIZE] = {0};
-	if(!l3_packet::validate_packet(open_ports, ip, mask, dummy_mac)){
-		return false;
-	}
 
 	// case 2.4 - ip_dst = NIC (without the mask)
 	if (memcmp(this->dst_ip, ip, IP_V4_SIZE) == 0) {
+		uint8_t dummy_mac[MAC_SIZE] = {0};
+		if (!l4_packet::validate_packet(open_ports, ip, mask, dummy_mac)){
+			return false;
+		}
 		return l4_packet::proccess_packet(open_ports, ip, mask, dst);
 	}
 
@@ -118,31 +115,21 @@ bool l3_packet::proccess_packet(open_port_vec &open_ports,
 	if (this->TTL <= 0){
 		return false;
 	}
-	std::string packet_string = "";
 
 	// case 2.1 - Packet entering the network - with the mask
 	if(!is_src_in_net && is_dst_in_net){
 		dst = RQ;
-/*		this->as_string(packet_string);
-		RQ.push_back(packet_string);*/
-		// @note - this is probably implemented in NIC.cpp
 	}
 
 	// case 2.2 - Packet exiting the network - with the mask
 	else if(is_src_in_net && !is_dst_in_net){
 		memcpy(this->src_ip, ip, IP_V4_SIZE);
 		dst = TQ;
-/*		this->as_string(packet_string);
-		TQ.push_back(packet_string);*/
-		// @note - this is probably implemented in NIC.cpp
 	}
 
-	// case 2.3 - Packet is going threw - with the mask
+	// case 2.3 - Packet is going through - with the mask
 	else if(!is_src_in_net && !is_dst_in_net){
 		dst = TQ;
-/*		this->as_string(packet_string);
-		TQ.push_back(packet_string);*/
-		// @note - this is probably implemented in NIC.cpp
 	}
 
 	return true;
@@ -157,6 +144,7 @@ bool l3_packet::proccess_packet(open_port_vec &open_ports,
  * @return true always.
  */
 bool l3_packet::as_string(std::string &packet){
+	packet = "";
 
 	for(int i = 0; i < IP_V4_SIZE; i++){
 		if(i != IP_V4_SIZE -1)

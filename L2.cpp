@@ -26,11 +26,6 @@ l2_packet::l2_packet(const std::string& raw_data)
 
 	tmp = extract_between_delimiters(raw_data, '|', 1, 1);
 	extract_and_write(tmp, this->dst_mac, HEX, ':');
-/*	tmp = extract_between_delimiters(raw_data, '|', 0, 0);
-	extract_mac(tmp, this->src_mac);
-
-	tmp = extract_between_delimiters(raw_data, '|', 1, 1);
-	extract_mac(tmp, this->dst_mac);*/
 
 	tmp = extract_between_delimiters(raw_data, '|', l3_end+1, -1);
 	this->CS_l2 =  static_cast<unsigned int>(std::stoul(tmp));
@@ -54,20 +49,16 @@ bool l2_packet::validate_packet(open_port_vec open_ports,
 								uint8_t mac[MAC_SIZE]) {
 
 	if (!l3_packet::validate_packet(open_ports, ip, mask, mac)) {
-		std::cout << "Failed due to l3 validation error! " << std::endl;
 		return false;
 	}
 
 	for (int i = 0; i < MAC_SIZE; i++) {
 		if (this->dst_mac[i] != mac[i]){
-			std::cout << "Failed due to MAC mismatch! " << std::endl;
 			return false;
 		}
 	}
-	unsigned int sum = calc_sum();
+	unsigned int sum = l2_packet::calc_sum();
 	if(this->CS_l2 != sum){
-		std::cout << "Failed due to CS_l2 mismatch! " << std::endl;
-		std::cout << "CS_l2 = " << this->CS_l2 << " sum = " << sum << std::endl;
 		return false;
 	}
 	return true;
@@ -96,10 +87,7 @@ bool l2_packet::proccess_packet(open_port_vec &open_ports,
 								uint8_t mask,
 								memory_dest &dst) {
 
-	/* @note - we can't call validate out of process since we don't have the
-	 * mac address thus NIC.cpp has to first call validate and than process! */
 	return l3_packet::proccess_packet(open_ports, ip, mask, dst);
-
 }
 
 /**
@@ -111,6 +99,8 @@ bool l2_packet::proccess_packet(open_port_vec &open_ports,
  * @return true always.
  */
 bool l2_packet::as_string(std::string &packet){
+	 return l3_packet::as_string(packet);
+	/*packet = "";
 
 	write_mac(packet, this->src_mac);
 	write_mac(packet, this->dst_mac);
@@ -119,7 +109,7 @@ bool l2_packet::as_string(std::string &packet){
 	l3_packet::as_string(l3_str);
 	packet += l3_str + "|" + std::to_string(this->CS_l2);
 
-	return true;
+	return true;*/
 }
 
 /**

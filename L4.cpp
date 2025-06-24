@@ -30,26 +30,7 @@ l4_packet::l4_packet(const std::string& raw_data) {
 
 	tmp = extract_between_delimiters(raw_data, '|', 3, -1);
 	extract_and_write(tmp, this->data, HEX, ' ');
-	/*for (int i = 0; i < PACKET_DATA_SIZE; i++) {
-		byte_str = extract_between_delimiters(tmp, ' ', i, i);
-		if (i == PACKET_DATA_SIZE-1) {
-			byte_str =
-				extract_between_delimiters(tmp, ' ', PACKET_DATA_SIZE-1, -1);
-		}
-		if (byte_str.empty()) {
-			this->data[i] = 0;
-		} else {
-			this->data[i] =
-				static_cast<unsigned char>(std::stoul(byte_str, nullptr, 16));
-		}
-	}*/
 }
-
-/* Getters */
-unsigned short l4_packet::get_src_port() const { return this->src_prt; }
-unsigned short l4_packet::get_dst_port() const { return this->dst_prt; }
-unsigned int l4_packet::get_addrs() const { return this->addrs; }
-const unsigned char* l4_packet::get_data() const { return this->data; }
 
 /*
  * @fn validate_packet
@@ -115,11 +96,11 @@ bool l4_packet::proccess_packet(open_port_vec &open_ports,
 								uint8_t mask,
 								memory_dest &dst) {
 
-	// @note this check is probably unnecessary!
+/*	// @note this check is probably unnecessary!
 	uint8_t dummy_mac[MAC_SIZE] = {0};
 	if(!l4_packet::validate_packet(open_ports, ip, mask, dummy_mac)){
 		return false;
-	}
+	}*/
 
 	for(open_port& port : open_ports){
 		if(this->dst_prt == port.dst_prt) {
