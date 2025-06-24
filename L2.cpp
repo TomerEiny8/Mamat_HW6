@@ -22,10 +22,15 @@ l2_packet::l2_packet(const std::string& raw_data)
 	l3_packet::as_string(tmp);
 
 	tmp = extract_between_delimiters(raw_data, '|', 0, 0);
+	extract_and_write(tmp, this->src_mac, HEX, ':');
+
+	tmp = extract_between_delimiters(raw_data, '|', 1, 1);
+	extract_and_write(tmp, this->dst_mac, HEX, ':');
+/*	tmp = extract_between_delimiters(raw_data, '|', 0, 0);
 	extract_mac(tmp, this->src_mac);
 
 	tmp = extract_between_delimiters(raw_data, '|', 1, 1);
-	extract_mac(tmp, this->dst_mac);
+	extract_mac(tmp, this->dst_mac);*/
 
 	tmp = extract_between_delimiters(raw_data, '|', l3_end+1, -1);
 	this->CS_l2 =  static_cast<unsigned int>(std::stoul(tmp));
@@ -99,7 +104,7 @@ bool l2_packet::proccess_packet(open_port_vec &open_ports,
 
 /**
  * @fn as_string
- * @brief Convert the packet to string.
+ * @brief Converts the packet to string.
  *
  * @param [out] packet - Packet as a string.
  *
@@ -107,25 +112,36 @@ bool l2_packet::proccess_packet(open_port_vec &open_ports,
  */
 bool l2_packet::as_string(std::string &packet){
 
-	for(int i = 0; i < MAC_SIZE; i++){
-		if(i != IP_V4_SIZE -1)
-			packet += std::to_string(this->src_mac[i]) + ":";
-		else
-			packet += std::to_string(this->src_mac[i]) + "|";
-	}
-
-	for(int i = 0; i < MAC_SIZE; i++){
-		if(i != IP_V4_SIZE -1)
-			packet += std::to_string(this->dst_mac[i]) + ":";
-		else
-			packet += std::to_string(this->dst_mac[i]) + "|";
-	}
+	write_mac(packet, this->src_mac);
+	write_mac(packet, this->dst_mac);
 
 	std::string l3_str;
 	l3_packet::as_string(l3_str);
 	packet += l3_str + "|" + std::to_string(this->CS_l2);
 
 	return true;
+}
+
+/**
+ * @fn write_mac
+ * @brief 	Parses the MAC into the string in HEX
+ * 			with ":" as delimiter and "|" at the end
+ *
+ * @param [out] packet - Packet as a string.
+ * @param [in]  mac - MAC to parse
+ *
+ * @return None.
+ */
+void l2_packet::write_mac(std::string &packet, uint8_t (&mac)[MAC_SIZE]) {
+	char byte_buf[3];	// "ff" + "\0"
+	for(int i = 0; i < MAC_SIZE; i++){
+		std::snprintf(byte_buf, sizeof(byte_buf), "%02x", mac[i]);
+		packet += byte_buf;
+		if(i != MAC_SIZE -1)
+			packet += ":";
+		else
+			packet += "|";
+	}
 }
 
 /**
@@ -151,32 +167,4 @@ unsigned int l2_packet::calc_sum() const {
 	}
 
 	return sum;
-}
-
-/**
- * @fn extarct_ip
- * @brief extracts a 6-Byte MAC from its string representation
- *
- * This function parses a string-formatted MAC (e.g. "45:60:6b:d9:15:8d")
- * and fills a 6 Byte array with the corresponding numeric values
- *
- * @param [in] mac_str The string containing the MAC with ':' as a delimiter
- * @param [out] mac The array to store the parsed MAC address into
- *
- * @return None.
- */
-void l2_packet::extract_mac(const std::string mac_str,
-		uint8_t (&mac)[MAC_SIZE]) {
-	std::string byte_str;
-	for (int i = 0; i < MAC_SIZE; i++) {
-		byte_str = extract_between_delimiters(mac_str, ':', i, i);
-		if (i == MAC_SIZE-1) {
-			byte_str = extract_between_delimiters
-					(mac_str, ':', MAC_SIZE-1, -1);
-		}
-		if (byte_str.empty()) {
-			byte_str = "0";
-		}
-		mac[i] = static_cast<uint8_t>(std::stoul(byte_str, nullptr, 16));
-	}
 }

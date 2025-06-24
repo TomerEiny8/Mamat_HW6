@@ -21,8 +21,7 @@ class l2_packet : public l3_packet {
 		uint8_t 		dst_mac[MAC_SIZE] = {0};
 	    unsigned int 	CS_l2 = 0;
 
-	    void extract_mac(const std::string ip_str, uint8_t (&mac)[MAC_SIZE]);
-	   /* uint32_t ip_with_mask(uint8_t mask, uint8_t ip[IP_V4_SIZE]);*/
+	    void write_mac(std::string &packet, uint8_t (&mac)[MAC_SIZE]);
 
 	public:
 		/* C'tor and D'tor */
