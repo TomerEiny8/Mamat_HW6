@@ -57,7 +57,6 @@ bool l3_packet::validate_packet(open_port_vec open_ports,
 		return false;
 	}
 
-	//////////////////////////////////////////////////////////////
 	if(static_cast<int>(this->TTL) <= 0){
 		return false;
 	}
@@ -142,14 +141,6 @@ bool l3_packet::proccess_packet(open_port_vec &open_ports,
 	return true;
 }
 
-int l3_packet::ip_sum_diff(uint8_t curr_ip[IP_V4_SIZE], uint8_t new_ip[IP_V4_SIZE]) {
-	int diff = 0;
-	for (int i = 0; i < IP_V4_SIZE; i++) {
-		diff += (new_ip[i] - curr_ip[i]);
-	}
-	return diff;
-}
-
 /**
  * @fn as_string
  * @brief Convert the packet to string.
@@ -202,6 +193,23 @@ unsigned int l3_packet::calc_sum() const {
 	sum += l4_packet::calc_sum();
 
 	return sum;
+}
+
+/**
+ * @fn ip_sum_diff
+ * @brief Compute the difference in byte-wise sum between two IPv4 addresses.
+ *
+ * @param ip_a - First IPv4 address.
+ * @param ip_b - Second IPv4 address.
+ *
+ * @return Sum of bytes in `ip_b` minus sum of bytes in `ip_a`
+ */
+int l3_packet::ip_sum_diff(uint8_t ip_a[IP_V4_SIZE], uint8_t ip_b[IP_V4_SIZE]) {
+	int diff = 0;
+	for (int i = 0; i < IP_V4_SIZE; i++) {
+		diff += (ip_b[i] - ip_a[i]);
+	}
+	return diff;
 }
 
 /**

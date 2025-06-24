@@ -48,8 +48,7 @@ bool l4_packet::validate_packet(open_port_vec open_ports,
 								uint8_t ip[IP_V4_SIZE],
 								uint8_t mask,
 								uint8_t mac[MAC_SIZE]) {
-	bool is_src_pckt = false;
-	bool is_dst_pckt = false;
+
 	if(this->src_prt == this->dst_prt) {
 		return false;
 	}
@@ -57,21 +56,6 @@ bool l4_packet::validate_packet(open_port_vec open_ports,
 			this->addrs > (DATA_ARR_SIZE - PACKET_DATA_SIZE)){
 		return false;
 	}
-	/*for(open_port& port : open_ports){
-		if(this->dst_prt == port.dst_prt) {
-			is_dst_pckt = true;
-		}
-	}
-	for(open_port& port : open_ports){
-		if(this->src_prt == port.src_prt) {
-			is_src_pckt = true;
-		}
-	}
-	if(is_src_pckt && is_dst_pckt){
-		return true;
-	}
-	return false;*/
-
 	return true;
 }
 
@@ -107,14 +91,6 @@ bool l4_packet::proccess_packet(open_port_vec &open_ports,
 		}
 	}
 	return flag;
-
-/*	for(open_port& port : open_ports){
-		if(this->dst_prt == port.dst_prt) {
-			memcpy(&port.data[this->addrs], this->data, PACKET_DATA_SIZE);
-			dst = LOCAL_DRAM;
-		}
-	}*/
-	// return true;
 }
 
 /**
