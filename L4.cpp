@@ -29,7 +29,8 @@ l4_packet::l4_packet(const std::string& raw_data) {
 	this->addrs =  static_cast<unsigned int>(std::stoul(tmp));
 
 	tmp = extract_between_delimiters(raw_data, '|', 3, -1);
-	for (int i = 0; i < PACKET_DATA_SIZE; i++) {
+	extract_and_write(tmp, this->data, HEX, ' ');
+	/*for (int i = 0; i < PACKET_DATA_SIZE; i++) {
 		byte_str = extract_between_delimiters(tmp, ' ', i, i);
 		if (i == PACKET_DATA_SIZE-1) {
 			byte_str =
@@ -41,7 +42,7 @@ l4_packet::l4_packet(const std::string& raw_data) {
 			this->data[i] =
 				static_cast<unsigned char>(std::stoul(byte_str, nullptr, 16));
 		}
-	}
+	}*/
 }
 
 /* Getters */
@@ -113,10 +114,13 @@ bool l4_packet::proccess_packet(open_port_vec &open_ports,
 								uint8_t ip[IP_V4_SIZE],
 								uint8_t mask,
 								memory_dest &dst) {
+
+	// @note this check is probably unnecessary!
 	uint8_t dummy_mac[MAC_SIZE] = {0};
 	if(!l4_packet::validate_packet(open_ports, ip, mask, dummy_mac)){
 		return false;
 	}
+
 	for(open_port& port : open_ports){
 		if(this->dst_prt == port.dst_prt) {
 			memcpy(&port.data[this->addrs], this->data, PACKET_DATA_SIZE);

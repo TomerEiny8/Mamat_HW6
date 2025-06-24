@@ -12,6 +12,8 @@
 #include <string>
 #include <cstring>
 
+enum NUMERIC_BASE { DEC = 10, HEX = 16 };
+
 class l4_packet : public generic_packet {
 	private:
 		unsigned short 	src_prt = 0;
@@ -43,6 +45,43 @@ class l4_packet : public generic_packet {
 	                                memory_dest &dst) override;
 
 		virtual bool as_string(std::string &packet) override;
+
+		/**
+		 * @fn extarct_and_write
+		 * @brief Extracts N Bytes of data from its delimited string
+		 * representation and writes the data into a given destination of size N
+		 *
+		 * This function extracts a string-formatted data with a given delimiter
+		 * (e.g. "45:60:6b:d9:15:8d", "102.52.229.159", "43 05 16 cd 47")
+		 * and fills an array of size N with the corresponding numeric values
+		 * interpreted in the specified base (DEC, HEX, ...)
+		 *
+		 *
+		 *	@tparam T The type of each element in the destination array.
+		 *	@tparam N The number of elements to extract and write.
+		 *
+		 * @param [in] src The string containing the data.
+		 * @param [in] base The required numeric base to of extracted data.
+		 * @param [in] delim The delimiter separating data bytes in the string.
+		 * @param [out] dst The array to store the parsed data bytes into.
+		 *
+		 * @return None.
+		 */
+		template <typename T, size_t N>
+		void extract_and_write(const std::string &src,
+				T (&dst)[N], int base, char delim) {
+			std::string byte_str;
+			for (size_t i = 0; i < N; i++) {
+				byte_str = extract_between_delimiters(src, delim, i, i);
+				if (i == N-1) {
+					byte_str = extract_between_delimiters(src, delim, N-1, -1);
+				}
+				if (byte_str.empty()) {
+					byte_str = "0";
+				}
+				dst[i] = static_cast<T>(std::stoul(byte_str, nullptr, base));
+			}
+		}
 };
 
 #endif /* L4_H_ */
