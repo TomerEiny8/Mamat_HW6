@@ -93,7 +93,7 @@ void nic_sim::nic_flow(const std::string packet_file) {
  * @return None.
  */
 void nic_sim::nic_print_results() {
-	std::cout << "LOCAL_DRAM:" << std::endl;
+	std::cout << "LOCAL DRAM:" << std::endl;
 
 	for(open_port& port : open_ports) {
 		std::cout << port.src_prt << " " << port.dst_prt << ": ";
